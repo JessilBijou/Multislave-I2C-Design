@@ -1,0 +1,41 @@
+import smbus
+import time
+
+# Define the I2C bus (for Raspberry Pi 3, use 1; for Raspberry Pi 4, use 3)
+i2c_bus = smbus.SMBus(1)
+
+# Define the addresses of the two I2C slave devices
+slave1_address = 0x10
+slave2_address = 0x20
+
+# Function to write data to an I2C slave device
+def write_to_slave(device_address, data):
+    try:
+        i2c_bus.write_i2c_block_data(device_address, 0x00, data)
+        print(f"Data sent to device 0x{device_address:02X}: {data}")
+    except Exception as e:
+        print(f"Error writing to device 0x{device_address:02X}: {str(e)}")
+
+# Function to read data from an I2C slave device
+def read_from_slave(device_address, num_bytes):
+    try:
+        data = i2c_bus.read_i2c_block_data(device_address, 0x00, num_bytes)
+        print(f"Data received from device 0x{device_address:02X}: {data}")
+        return data
+    except Exception as e:
+        print(f"Error reading from device 0x{device_address:02X}: {str(e)}")
+        return None
+
+# Example usage:
+
+# Write data to the first slave device (0x10)
+write_to_slave(slave1_address, [0xAA, 0xBB, 0xCC])
+
+# Read data from the second slave device (0x20)
+data = read_from_slave(slave2_address, 3)
+
+# You can then process the received data as needed
+if data is not None:
+    # Example: Convert the received data to an integer
+    value = (data[0] << 16) | (data[1] << 8) | data[2]
+    print(f"Converted value: {value}")
