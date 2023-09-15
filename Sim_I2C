@@ -1,0 +1,55 @@
+# Simulated I2C Bus
+class I2C:
+    def __init__(self):
+        self.devices = {}  # Dictionary to store connected devices
+
+    def connect_device(self, address, device):
+        self.devices[address] = device
+
+    def write_byte(self, address, data):
+        if address in self.devices:
+            device = self.devices[address]
+            device.receive_data(data)
+        else:
+            print(f"No device found at address {address}")
+
+    def read_byte(self, address):
+        if address in self.devices:
+            device = self.devices[address]
+            return device.send_data()
+        else:
+            print(f"No device found at address {address}")
+
+
+# Simulated I2C Device
+class I2CDevice:
+    def __init__(self, address):
+        self.address = address
+        self.data = 0
+
+    def receive_data(self, data):
+        self.data = data
+
+    def send_data(self):
+        return self.data
+
+
+# Create an I2C bus
+i2c_bus = I2C()
+
+# Connect multiple I2C devices
+device1 = I2CDevice(0x10)
+device2 = I2CDevice(0x20)
+
+i2c_bus.connect_device(0x10, device1)
+i2c_bus.connect_device(0x20, device2)
+
+# Test communication
+i2c_bus.write_byte(0x10, 0xAA)
+i2c_bus.write_byte(0x20, 0xBB)
+
+data1 = i2c_bus.read_byte(0x10)
+data2 = i2c_bus.read_byte(0x20)
+
+print(f"Data received from device 0x10: {data1}")
+print(f"Data received from device 0x20: {data2}")
